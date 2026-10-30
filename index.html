@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-Pop Ultimate Quiz Master 🌟</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Poppins & Orbitron -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        kpop: {
+                            pink: '#ff2a85',
+                            purple: '#9d4edd',
+                            cyan: '#00f5d4',
+                            yellow: '#ffee32',
+                            dark: '#0f0c1b',
+                            card: '#1a1528',
+                            accent: '#ff007f'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        display: ['Orbitron', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'neon-pink': '0 0 15px rgba(255, 42, 133, 0.6), 0 0 30px rgba(255, 42, 133, 0.3)',
+                        'neon-cyan': '0 0 15px rgba(0, 245, 212, 0.6), 0 0 30px rgba(0, 245, 212, 0.3)',
+                        'neon-purple': '0 0 15px rgba(157, 78, 221, 0.6), 0 0 30px rgba(157, 78, 221, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0f0c1b;
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(255, 42, 133, 0.15) 0px, transparent 50%),
+                radial-gradient(at 90% 90%, rgba(0, 245, 212, 0.15) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(157, 78, 221, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: #ffffff;
+            user-select: none;
+        }
+
+        .glass-panel {
+            background: rgba(26, 21, 40, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .glow-text {
+            text-shadow: 0 0 10px rgba(255, 42, 133, 0.7), 0 0 20px rgba(255, 42, 133, 0.5);
+        }
+
+        .glow-cyan-text {
+            text-shadow: 0 0 10px rgba(0, 245, 212, 0.7), 0 0 20px rgba(0, 245, 212, 0.5);
+        }
+
+        .btn-neon {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-neon:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(255, 42, 133, 0.8);
+        }
+
+        .btn-neon:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+
+        /* Animated Progress Bar */
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        .animate-pulse-glow {
+            animation: pulse-glow 1.5s infinite;
+        }
+
+        /* Floating animation for avatar/icons */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f0c1b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ff2a85;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between font-sans antialiased overflow-x-hidden">
+
+    <!-- Header / Navbar -->
+    <header class="w-full max-w-5xl mx-auto px-4 py-4 flex justify-between items-center z-20">
+        <div class="flex items-center gap-3 cursor-pointer" onclick="showScreen('home')">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-kpop-pink to-kpop-cyan flex items-center justify-center shadow-neon-pink">
+                <i class="fa-solid font-bold text-xl text-white fa-compact-disc animate-spin" style="animation-duration: 8s;"></i>
+            </div>
+            <div>
+                <h1 class="font-display font-extrabold text-xl md:text-2xl bg-clip-text text-transparent bg-gradient-to-r from-kpop-pink via-purple-300 to-kpop-cyan">
+                    K-POP <span class="text-white">QUIZ</span>
+                </h1>
+                <p class="text-xs text-pink-300 tracking-wider">ULTIMATE IDOL CHALLENGE</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <button id="soundToggleBtn" onclick="toggleSound()" class="glass-panel w-10 h-10 rounded-full flex items-center justify-center text-kpop-cyan hover:border-kpop-cyan transition-all">
+                <i id="soundIcon" class="fa-solid fa-volume-high"></i>
+            </button>
+            <button onclick="showScreen('leaderboard')" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm font-semibold hover:border-kpop-pink transition-all text-pink-300">
+                <i class="fa-solid fa-trophy text-kpop-yellow"></i>
+                <span class="hidden sm:inline">Leaderboard</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow flex items-center justify-center px-4 py-6 z-10">
+        
+        <!-- ================= 1. HOME / MODE SELECT SCREEN ================= -->
+        <section id="homeScreen" class="w-full max-w-4xl flex flex-col items-center">
+            
+            <div class="text-center mb-8 animate-float">
+                <span class="px-4 py-1.5 rounded-full bg-pink-500/20 border border-pink-500/40 text-kpop-pink text-xs font-bold tracking-widest uppercase mb-3 inline-block">
+                    ✨ The Ultimate K-Pop Trivia ✨
+                </span>
+                <h2 class="font-display text-3xl md:text-5xl font-black mb-3 glow-text text-white">
+                    UJI WAWASAN K-POP MU!
+                </h2>
+                <p class="text-gray-300 text-sm md:text-base max-w-lg mx-auto">
+                    Pilih mode permainan, kumpulkan combo streak, dan buktikan kamu adalah <strong class="text-kpop-cyan">K-Pop Legend</strong> sejati!
+                </p>
+            </div>
+
+            <!-- Filter Kategori Generasi/Grup -->
+            <div class="glass-panel p-4 rounded-2xl w-full max-w-2xl mb-8 border border-purple-500/30">
+                <div class="text-xs font-semibold text-purple-300 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-filter text-kpop-cyan"></i> Filter Kategori Lagu & Grup
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <button onclick="setCategory('all')" id="cat-all" class="cat-btn bg-kpop-pink text-white text-xs font-bold py-2 px-3 rounded-xl transition-all">Semua Gen</button>
+                    <button onclick="setCategory('gen23')" id="cat-gen23" class="cat-btn bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-bold py-2 px-3 rounded-xl transition-all">Gen 2 & 3 Classic</button>
+                    <button onclick="setCategory('gen45')" id="cat-gen45" class="cat-btn bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-bold py-2 px-3 rounded-xl transition-all">Gen 4 & 5 Modern</button>
+                    <button onclick="setCategory('gg')" id="cat-gg" class="cat-btn bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-bold py-2 px-3 rounded-xl transition-all">Girlgroup Only</button>
+                </div>
+            </div>
+
+            <!-- Game Mode Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+                
+                <!-- Mode 1: Tebak Lagu -->
+                <div onclick="startGame('song')" class="glass-panel p-5 rounded-2xl cursor-pointer hover:border-kpop-pink group transition-all duration-300 relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-pink-500/10 group-hover:text-pink-500/20 text-8xl font-black transition-all">
+                        <i class="fa-solid fa-music"></i>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center text-kpop-pink mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-headphones text-2xl"></i>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-white group-hover:text-kpop-pink transition-colors">Tebak Lagu</h3>
+                    <p class="text-xs text-gray-400 mt-1">Dengarkan melodi Synth Audio / Lirik Emoji & tebak judul lagunya!</p>
+                </div>
+
+                <!-- Mode 2: Tebak Member / Idol -->
+                <div onclick="startGame('idol')" class="glass-panel p-5 rounded-2xl cursor-pointer hover:border-kpop-cyan group transition-all duration-300 relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-cyan-500/10 group-hover:text-cyan-500/20 text-8xl font-black transition-all">
+                        <i class="fa-solid fa-user-ninja"></i>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center text-kpop-cyan mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-user-astronaut text-2xl"></i>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-white group-hover:text-kpop-cyan transition-colors">Tebak Idol / Member</h3>
+                    <p class="text-xs text-gray-400 mt-1">Kenali idol dari siluet avatar visual, fakta unik, atau posisi grup!</p>
+                </div>
+
+                <!-- Mode 3: Tebak Grup -->
+                <div onclick="startGame('group')" class="glass-panel p-5 rounded-2xl cursor-pointer hover:border-purple-400 group transition-all duration-300 relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-purple-500/10 group-hover:text-purple-500/20 text-8xl font-black transition-all">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center text-kpop-purple mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-people-group text-2xl"></i>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-white group-hover:text-purple-300 transition-colors">Tebak Grup</h3>
+                    <p class="text-xs text-gray-400 mt-1">Tebak nama grup K-Pop berdasarkan Fandom, Agensi, Debut & Clues!</p>
+                </div>
+
+                <!-- Mode 4: K-Pop Quiz Trivia -->
+                <div onclick="startGame('trivia')" class="glass-panel p-5 rounded-2xl cursor-pointer hover:border-kpop-yellow group transition-all duration-300 relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-yellow-500/10 group-hover:text-yellow-500/20 text-8xl font-black transition-all">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center text-kpop-yellow mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-brain text-2xl"></i>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-white group-hover:text-kpop-yellow transition-colors">K-Pop Trivia</h3>
+                    <p class="text-xs text-gray-400 mt-1">Soal wawasan umum K-Pop: Rekor, MV, Agensi, Awards & Fakta Unik.</p>
+                </div>
+
+                <!-- Mode 5: Survival Time Attack -->
+                <div onclick="startGame('survival')" class="glass-panel p-5 rounded-2xl cursor-pointer hover:border-red-500 group transition-all duration-300 relative overflow-hidden md:col-span-2 lg:col-span-2 bg-gradient-to-r from-red-900/20 to-purple-900/20">
+                    <div class="absolute -right-4 -bottom-4 text-red-500/10 group-hover:text-red-500/20 text-8xl font-black transition-all">
+                        <i class="fa-solid fa-stopwatch"></i>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center text-red-400 group-hover:scale-110 transition-transform flex-shrink-0">
+                            <i class="fa-solid fa-fire text-2xl"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-display text-lg font-bold text-white group-hover:text-red-400 transition-colors">Survival / Time Attack ⚡</h3>
+                                <span class="bg-red-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full animate-pulse">HOT</span>
+                            </div>
+                            <p class="text-xs text-gray-300 mt-0.5">Pacu waktu 60 detik! Jawab pertanyaan acak sebanyak-banyaknya tanpa salah!</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= 2. GAMEPLAY SCREEN ================= -->
+        <section id="gameScreen" class="w-full max-w-2xl hidden">
+            
+            <!-- Quiz HUD (Header Info: Score, Combo, Timer) -->
+            <div class="glass-panel p-4 rounded-2xl mb-4 flex items-center justify-between gap-2 border border-white/10">
+                <!-- Progress & Score -->
+                <div class="flex items-center gap-3">
+                    <div class="text-center">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest block">SKOR</span>
+                        <span id="currentScore" class="font-display font-extrabold text-xl text-kpop-cyan glow-cyan-text">0</span>
+                    </div>
+                    <div class="h-8 w-px bg-white/10"></div>
+                    <!-- Streak Combo -->
+                    <div class="text-center">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest block">STREAK</span>
+                        <div class="flex items-center gap-1">
+                            <i class="fa-solid fa-bolt text-xs text-kpop-yellow"></i>
+                            <span id="streakCount" class="font-display font-extrabold text-lg text-kpop-yellow">x0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timer (for Survival or regular timer) -->
+                <div class="flex flex-col items-end">
+                    <span id="timerLabel" class="text-[10px] text-gray-400 uppercase tracking-widest">SISA WAKTU</span>
+                    <div class="flex items-center gap-2">
+                        <div class="w-24 bg-gray-700/50 rounded-full h-2.5 overflow-hidden border border-white/10 hidden sm:block">
+                            <div id="timerBar" class="bg-gradient-to-r from-kpop-cyan to-kpop-pink h-full w-full transition-all duration-1000"></div>
+                        </div>
+                        <span id="timerText" class="font-display font-black text-xl text-pink-400">20s</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="glass-panel p-6 rounded-3xl relative overflow-hidden border border-purple-500/30 shadow-2xl">
+                
+                <!-- Category Badge & Question Counter -->
+                <div class="flex justify-between items-center mb-4 text-xs font-semibold">
+                    <span id="modeBadge" class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center gap-1">
+                        <i class="fa-solid fa-gamepad"></i> Mode Quiz
+                    </span>
+                    <span id="questionNum" class="text-gray-400">Soal 1 / 10</span>
+                </div>
+
+                <!-- Visual / Audio Prompt Area -->
+                <div id="promptContainer" class="mb-6 flex flex-col items-center justify-center min-h-[160px] bg-black/40 rounded-2xl p-4 border border-white/5 relative">
+                    <!-- Audio Player Interactive View (for Song Mode) -->
+                    <div id="audioPrompt" class="hidden flex-col items-center gap-3 py-2">
+                        <div id="discVisual" class="w-20 h-20 rounded-full bg-gradient-to-tr from-kpop-pink via-purple-600 to-kpop-cyan flex items-center justify-center shadow-neon-pink">
+                            <i class="fa-solid fa-compact-disc text-4xl text-white"></i>
+                        </div>
+                        <button id="playAudioBtn" onclick="playQuestionMelody()" class="btn-neon px-5 py-2.5 bg-gradient-to-r from-kpop-pink to-purple-600 text-white text-xs font-bold rounded-full flex items-center gap-2">
+                            <i class="fa-solid fa-play"></i> Putar Sample Melodi Synth
+                        </button>
+                        <span class="text-[11px] text-gray-400 italic">Klik tombol untuk mendengarkan potongan melodi!</span>
+                    </div>
+
+                    <!-- Visual Avatar / Silhouette (for Idol / Group Mode) -->
+                    <div id="visualPrompt" class="hidden flex-col items-center gap-2">
+                        <div id="avatarBox" class="w-24 h-24 rounded-full bg-gradient-to-br from-purple-800 to-pink-900 border-2 border-kpop-pink flex items-center justify-center text-4xl shadow-neon-pink">
+                            👤
+                        </div>
+                        <span id="visualSubtitle" class="text-xs text-pink-300 font-semibold mt-1">Clue Visual</span>
+                    </div>
+
+                    <!-- Text Question Prompt -->
+                    <h3 id="questionText" class="text-base sm:text-lg font-bold text-center text-white mt-2 leading-relaxed">
+                        Memuat pertanyaan...
+                    </h3>
+
+                    <!-- Hint Display Box -->
+                    <div id="extraHintBox" class="hidden mt-3 p-2.5 bg-yellow-500/10 border border-yellow-500/30 rounded-xl text-yellow-300 text-xs text-center w-full animate-fade-in">
+                        <i class="fa-solid fa-lightbulb mr-1"></i> <span id="extraHintText">Petunjuk tambahan akan muncul di sini.</span>
+                    </div>
+                </div>
+
+                <!-- Options Grid -->
+                <div id="optionsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                    <!-- Option buttons will be rendered dynamically -->
+                </div>
+
+                <!-- Lifelines / Bantuan -->
+                <div class="border-t border-white/10 pt-4 flex items-center justify-between gap-2">
+                    <span class="text-xs text-gray-400 font-medium">Bantuan:</span>
+                    <div class="flex gap-2">
+                        <button id="btn5050" onclick="useLifeline('5050')" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-purple-600/30 border border-white/10 text-xs font-semibold text-purple-300 flex items-center gap-1.5 transition-all">
+                            <span>50:50</span>
+                        </button>
+                        <button id="btnHint" onclick="useLifeline('hint')" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-yellow-600/30 border border-white/10 text-xs font-semibold text-yellow-300 flex items-center gap-1.5 transition-all">
+                            <i class="fa-solid fa-lightbulb"></i> Clue
+                        </button>
+                        <button id="btnSkip" onclick="useLifeline('skip')" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-cyan-600/30 border border-white/10 text-xs font-semibold text-kpop-cyan flex items-center gap-1.5 transition-all">
+                            <i class="fa-solid fa-forward"></i> Skip
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= 3. SCORE SUMMARY / RESULT SCREEN ================= -->
+        <section id="resultScreen" class="w-full max-w-lg hidden">
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl text-center border border-kpop-pink/40 relative overflow-hidden shadow-2xl">
+                
+                <div class="mb-4">
+                    <span class="text-xs font-bold tracking-widest uppercase text-pink-400">HASIL PERMAINAN</span>
+                    <h2 class="font-display text-3xl font-black text-white mt-1">QUIZ SELESAI! 🎉</h2>
+                </div>
+
+                <!-- Rank Badge -->
+                <div class="my-6 p-4 rounded-2xl bg-gradient-to-b from-purple-900/40 to-pink-900/30 border border-pink-500/30 flex flex-col items-center">
+                    <div id="rankIcon" class="text-5xl mb-2 animate-bounce">🏆</div>
+                    <span class="text-xs text-gray-400 uppercase tracking-widest">Gelar K-Pop Kamu</span>
+                    <h3 id="rankTitle" class="font-display text-2xl font-black text-kpop-yellow glow-text mt-0.5">K-POP LEGEND</h3>
+                    <p id="rankDesc" class="text-xs text-gray-300 mt-2 px-2">Wawasan K-Pop kamu sempurna! Kamu siap jadi Idol papan atas!</p>
+                </div>
+
+                <!-- Statistics Grid -->
+                <div class="grid grid-cols-3 gap-2 mb-6">
+                    <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                        <span class="text-[10px] text-gray-400 uppercase block">Total Skor</span>
+                        <span id="finalScore" class="font-display font-extrabold text-xl text-kpop-cyan">0</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                        <span class="text-[10px] text-gray-400 uppercase block">Akurasi</span>
+                        <span id="finalAccuracy" class="font-display font-extrabold text-xl text-kpop-pink">0%</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                        <span class="text-[10px] text-gray-400 uppercase block">Max Combo</span>
+                        <span id="finalCombo" class="font-display font-extrabold text-xl text-kpop-yellow">0x</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button onclick="retryCurrentMode()" class="btn-neon flex-1 py-3 bg-gradient-to-r from-kpop-pink to-purple-600 text-white font-bold rounded-2xl text-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> Main Lagi
+                    </button>
+                    <button onclick="showScreen('home')" class="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl text-sm border border-white/10 flex items-center justify-center gap-2 transition-all">
+                        <i class="fa-solid fa-house"></i> Menu Utama
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= 4. LEADERBOARD SCREEN ================= -->
+        <section id="leaderboardScreen" class="w-full max-w-xl hidden">
+            <div class="glass-panel p-6 rounded-3xl border border-purple-500/30">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-trophy text-2xl text-kpop-yellow"></i>
+                        <h2 class="font-display text-xl font-bold text-white">Leaderboard Lokal</h2>
+                    </div>
+                    <button onclick="showScreen('home')" class="text-gray-400 hover:text-white text-sm font-semibold">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- High Scores Table -->
+                <div id="leaderboardList" class="space-y-3 mb-6 max-h-80 overflow-y-auto pr-1">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <div class="text-center">
+                    <button onclick="clearLeaderboard()" class="text-xs text-red-400 hover:text-red-300 underline">
+                        Reset Rekor Skor
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-4 text-xs text-gray-500 z-10">
+        <p>K-Pop Ultimate Quiz Master &copy; 2026 • Made with ❤️ for K-Pop Fans worldwide</p>
+    </footer>
+
+    <!-- Audio Synth & Game Logic JavaScript -->
+    <script>
+        /* ==========================================================================
+           AUDIO SYNTHESIZER & SOUND EFFECTS (Web Audio API)
+           ========================================================================== */
+        class SoundSystem {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            playTone(freq, duration, type = 'sine', gainVal = 0.1) {
+                if (!this.enabled) return;
+                try {
+                    this.init();
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch(e) { console.error(e); }
+            }
+
+            playCorrect() {
+                if (!this.enabled) return;
+                this.playTone(523.25, 0.1, 'triangle', 0.15); // C5
+                setTimeout(() => this.playTone(659.25, 0.1, 'triangle', 0.15), 80); // E5
+                setTimeout(() => this.playTone(783.99, 0.25, 'triangle', 0.15), 160); // G5
+            }
+
+            playWrong() {
+                if (!this.enabled) return;
+                this.playTone(220, 0.15, 'sawtooth', 0.15);
+                setTimeout(() => this.playTone(180, 0.25, 'sawtooth', 0.15), 120);
+            }
+
+            playClick() {
+                this.playTone(400, 0.05, 'sine', 0.05);
+            }
+
+            playMelodyNotes(notes) {
+                if (!this.enabled) return;
+                this.init();
+                let delay = 0;
+                notes.forEach(note => {
+                    setTimeout(() => {
+                        this.playTone(note.freq, note.duration || 0.25, 'sine', 0.2);
+                    }, delay * 1000);
+                    delay += (note.duration || 0.25) + 0.05;
+                });
+            }
+        }
+
+        const sounds = new SoundSystem();
+
+        function toggleSound() {
+            sounds.enabled = !sounds.enabled;
+            const soundIcon = document.getElementById('soundIcon');
+            const soundBtn = document.getElementById('soundToggleBtn');
+            if (sounds.enabled) {
+                soundIcon.className = 'fa-solid fa-volume-high';
+                soundBtn.classList.remove('opacity-50');
+            } else {
+                soundIcon.className = 'fa-solid fa-volume-xmark';
+                soundBtn.classList.add('opacity-50');
+            }
+        }
+
+        /* ==========================================================================
+           QUESTION DATABASE (K-POP GEN 2, 3, 4, 5)
+           ========================================================================== */
+        const questionDatabase = {
+            // Mode 1: Tebak Lagu (Audio Synth Melody & Clues)
+            song: [
+                {
+                    type: 'song',
+                    gen: 'gen45',
+                    typeGroup: 'gg',
+                    text: 'Lagu K-Pop mana yang memiliki melodi & petunjuk emoji berikut?',
+                    emojiClue: '👖 🐱 👟 (NewJeans)',
+                    melody: [
+                        {freq: 440, duration: 0.2}, {freq: 493.88, duration: 0.2}, {freq: 523.25, duration: 0.3}, {freq: 587.33, duration: 0.4}
+                    ],
+                    hint: 'Rilis tahun 2022 oleh girlgroup buatan ADOR / HYBE.',
+                    options: ['Hype Boy', 'OMG', 'Super Shy', 'Ditto'],
+                    answer: 0
+                },
+                {
+                    type: 'song',
+                    gen: 'gen23',
+                    typeGroup: 'bg',
+                    text: 'Lagu mana yang terkenal dengan beat perkusi energik & lirik "BANG BANG BANG"?',
+                    emojiClue: '💥 💥 💥 👑 🚗',
+                    melody: [
+                        {freq: 261.63, duration: 0.2}, {freq: 261.63, duration: 0.2}, {freq: 392.00, duration: 0.4}
+                    ],
+                    hint: 'Lagu mega-hits dari BIGBANG tahun 2015.',
+                    options: ['BANG BANG BANG', 'FANTASTIC BABY', 'LOSER', 'HARU HARU'],
+                    answer: 0
+                },
+                {
+                    type: 'song',
+                    gen: 'gen23',
+                    typeGroup: 'gg',
+                    text: 'Lagu BLACKPINK mana yang lirik ikoniknya berbunyi "Hit you with that ddu-du ddu-du"?',
+                    emojiClue: '🖤 💖 🔫 👑',
+                    melody: [
+                        {freq: 329.63, duration: 0.2}, {freq: 329.63, duration: 0.2}, {freq: 349.23, duration: 0.3}
+                    ],
+                    hint: 'MV lagu ini menjadi salah satu yang paling banyak ditonton di YouTube.',
+                    options: ['Kill This Love', 'DDU-DU DDU-DU', 'How You Like That', 'Boombayah'],
+                    answer: 1
+                },
+                {
+                    type: 'song',
+                    gen: 'gen45',
+                    typeGroup: 'gg',
+                    text: 'Lagu viral dari aespa yang ikonik dengan konsep Metaverse dan lirik "I\'m on the Next Level"?',
+                    emojiClue: '🐍 🤖 💃 🚀',
+                    melody: [
+                        {freq: 370, duration: 0.25}, {freq: 415, duration: 0.25}, {freq: 466, duration: 0.4}
+                    ],
+                    hint: 'Rilis pada tahun 2021 dengan tarian tangan khas.',
+                    options: ['Black Mamba', 'Next Level', 'Savage', 'Supernova'],
+                    answer: 1
+                },
+                {
+                    type: 'song',
+                    gen: 'gen23',
+                    typeGroup: 'bg',
+                    text: 'Lagu BTS pertama yang berhasil meraih peringkat 1 di Billboard Hot 100?',
+                    emojiClue: '🧨 🕺 🪩 🧈',
+                    melody: [
+                        {freq: 523.25, duration: 0.2}, {freq: 587.33, duration: 0.2}, {freq: 659.25, duration: 0.4}
+                    ],
+                    hint: 'Lagu full berbahasa Inggris dirilis tahun 2020.',
+                    options: ['Butter', 'Dynamite', 'Boy With Luv', 'DNA'],
+                    answer: 1
+                },
+                {
+                    type: 'song',
+                    gen: 'gen45',
+                    typeGroup: 'gg',
+                    text: 'Lagu IVE mana yang memiliki lirik ikonik "What\'s after LIKE?"',
+                    emojiClue: '💘 🎆 📸 💖',
+                    melody: [
+                        {freq: 440, duration: 0.2}, {freq: 554.37, duration: 0.2}, {freq: 659.25, duration: 0.4}
+                    ],
+                    hint: 'Menggunakan sampel lagu klasik I Will Survive.',
+                    options: ['ELEVEN', 'LOVE DIVE', 'After LIKE', 'I AM'],
+                    answer: 2
+                }
+            ],
+
+            // Mode 2: Tebak Idol / Member
+            idol: [
+                {
+                    type: 'idol',
+                    gen: 'gen23',
+                    typeGroup: 'bg',
+                    avatar: '👑 💜',
+                    text: 'Siapakah member BTS yang dijuluki "World Wide Handsome" & member tertua di grup?',
+                    hint: 'Nama aslinya adalah Kim Seok-jin.',
+                    options: ['Jin', 'V', 'Jungkook', 'J-Hope'],
+                    answer: 0
+                },
+                {
+                    type: 'idol',
+                    gen: 'gen23',
+                    typeGroup: 'gg',
+                    avatar: '👗 💃',
+                    text: 'Member BLACKPINK yang juga dikenal sebagai global ambassador Chanel dan baru rilis lagu "Mantra"?',
+                    hint: 'Dikenal dengan julukan Human Chanel.',
+                    options: ['Jisoo', 'Jennie', 'Rosé', 'Lisa'],
+                    answer: 1
+                },
+                {
+                    type: 'idol',
+                    gen: 'gen45',
+                    typeGroup: 'gg',
+                    avatar: '🐱 🎤',
+                    text: 'Leader & Producer dari girlgroup (G)I-DLE yang terkenal serba bisa?',
+                    hint: 'Sering berpartisipasi penuh menciptakan lagu-lagu grupnya.',
+                    options: ['Soyeon', 'Miyeon', 'Minnie', 'Yuqi'],
+                    answer: 0
+                },
+                {
+                    type: 'idol',
+                    gen: 'gen45',
+                    typeGroup: 'bg',
+                    avatar: '🐺 🎶',
+                    text: 'Leader dari Stray Kids yang memproduseri lagu-lagu grup bersama 3RACHA?',
+                    hint: 'Berasal dari Australia.',
+                    options: ['Bang Chan', 'Felix', 'Lee Know', 'Hyunjin'],
+                    answer: 0
+                },
+                {
+                    type: 'idol',
+                    gen: 'gen23',
+                    typeGroup: 'gg',
+                    avatar: '🐰 🍓',
+                    text: 'Center & member tertua dari TWICE yang merilis solo debut "POP!"?',
+                    hint: 'Nama aslinya Im Na-yeon.',
+                    options: ['Sana', 'Nayeon', 'Jihyo', 'Momo'],
+                    answer: 1
+                }
+            ],
+
+            // Mode 3: Tebak Grup
+            group: [
+                {
+                    type: 'group',
+                    gen: 'gen45',
+                    typeGroup: 'gg',
+                    avatar: '🌟 💫',
+                    text: 'Grup manakah yang memiliki nama Fandom "FEARNOT" dan beranggota 5 orang di HYBE/Source Music?',
+                    hint: 'Slogan grup: "I\'m fearless".',
+                    options: ['LE SSERAFIM', 'NewJeans', 'ILLIT', 'NMIXX'],
+                    answer: 0
+                },
+                {
+                    type: 'group',
+                    gen: 'gen23',
+                    typeGroup: 'bg',
+                    avatar: '💎 💎',
+                    text: 'Grup dengan 13 member di Pledis Entertainment yang terbagi dalam 3 unit (Vocal, Hip-hop, Performance)?',
+                    hint: 'Nama Fandom mereka adalah CARAT.',
+                    options: ['EXO', 'SEVENTEEN', 'NCT 127', 'Stray Kids'],
+                    answer: 1
+                },
+                {
+                    type: 'group',
+                    gen: 'gen23',
+                    typeGroup: 'bg',
+                    avatar: '🌌 🚀',
+                    text: 'Grup SM Entertainment yang mengusung konsep konsep sub-unit tak terbatas (127, DREAM, WayV)?',
+                    hint: 'Fandom-nya bernama NCTzen.',
+                    options: ['EXO', 'NCT', 'SHINee', 'RIIZE'],
+                    answer: 1
+                },
+                {
+                    type: 'group',
+                    gen: 'gen45',
+                    typeGroup: 'gg',
+                    avatar: '🪐 🛸',
+                    text: 'Girlgroup SM Entertainment beranggota Karina, Giselle, Winter, dan Ningning?',
+                    hint: 'Mempunyai konsep avatar ae (KWANGYA).',
+                    options: ['Red Velvet', 'aespa', 'IVE', 'STAYC'],
+                    answer: 1
+                },
+                {
+                    type: 'group',
+                    gen: 'gen23',
+                    typeGroup: 'gg',
+                    avatar: '🍰 🍦',
+                    text: 'Girlgroup SM Entertainment beranggota Irene, Seulgi, Wendy, Joy, dan Yeri?',
+                    hint: 'Lagu hits mereka termasuk "Psycho" dan "Red Flavor".',
+                    options: ['Red Velvet', 'Girls\' Generation', 'f(x)', 'MAMAMOO'],
+                    answer: 0
+                }
+            ],
+
+            // Mode 4: K-Pop Trivia
+            trivia: [
+                {
+                    type: 'trivia',
+                    gen: 'gen23',
+                    typeGroup: 'bg',
+                    text: 'Agensi manakah yang dijuluki "BIG 3" klasik dalam industri K-Pop?',
+                    hint: 'Tiga agensi terbesar pendiri era Hallyu.',
+                    options: ['SM, JYP, YG', 'HYBE, SM, JYP', 'YG, HYBE, Cube', 'Starship, SM, YG'],
+                    answer: 0
+                },
+                {
+                    type: 'trivia',
+                    gen: 'gen23',
+                    typeGroup: 'bg',
+                    text: 'Video Musik (MV) K-Pop manakah yang pertama kali menembus 1 Miliar Views di YouTube?',
+                    hint: 'Rilis pada tahun 2012 dan menjadi fenomena global tarian kuda.',
+                    options: ['Gangnam Style - PSY', 'DDU-DU DDU-DU - BLACKPINK', 'DNA - BTS', 'Fantastic Baby - BIGBANG'],
+                    answer: 0
+                },
+                {
+                    type: 'trivia',
+                    gen: 'gen45',
+                    typeGroup: 'gg',
+                    text: 'Istilah "Maknae" dalam grup K-Pop memiliki arti apa?',
+                    hint: 'Merujuk pada urutan usia dalam grup.',
+                    options: ['Member Tertua', 'Leader Grup', 'Member Termuda', 'Main Vocalist'],
+                    answer: 2
+                },
+                {
+                    type: 'trivia',
+                    gen: 'gen23',
+                    typeGroup: 'bg',
+                    text: 'Apa nama stik lampu resmi yang dibawa fans saat konser K-Pop?',
+                    hint: 'Sering memiliki bentuk unik tiap grup.',
+                    options: ['Lightstick', 'Glowstick', 'Fanstick', 'Cheer Wand'],
+                    answer: 0
+                },
+                {
+                    type: 'trivia',
+                    gen: 'gen45',
+                    typeGroup: 'gg',
+                    text: 'Acara kompetisi Mnet yang membentuk grup Kep1er dan Zerobaseone (ZB1)?',
+                    hint: 'Memiliki nama seri "Girls Planet" dan "Boys Planet".',
+                    options: ['Produce 101', 'Planet Series', 'Queendom', 'Kingdom'],
+                    answer: 1
+                }
+            ]
+        };
+
+        /* ==========================================================================
+           GAME STATE MANAGEMENT
+           ========================================================================== */
+        let gameState = {
+            mode: 'song',
+            category: 'all', // all, gen23, gen45, gg
+            score: 0,
+            streak: 0,
+            maxStreak: 0,
+            currentQuestionIdx: 0,
+            questions: [],
+            timer: null,
+            timeLeft: 15,
+            lifelines: {
+                '5050': true,
+                'hint': true,
+                'skip': true
+            },
+            correctAnswersCount: 0,
+            totalAnswered: 0
+        };
+
+        /* ==========================================================================
+           NAVIGATION & UI LOGIC
+           ========================================================================== */
+        function showScreen(screenId) {
+            sounds.playClick();
+            document.getElementById('homeScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('leaderboardScreen').classList.add('hidden');
+
+            if (screenId === 'home') document.getElementById('homeScreen').classList.remove('hidden');
+            if (screenId === 'game') document.getElementById('gameScreen').classList.remove('hidden');
+            if (screenId === 'result') document.getElementById('resultScreen').classList.remove('hidden');
+            if (screenId === 'leaderboard') {
+                renderLeaderboard();
+                document.getElementById('leaderboardScreen').classList.remove('hidden');
+            }
+        }
+
+        function setCategory(cat) {
+            sounds.playClick();
+            gameState.category = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.className = 'cat-btn bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-bold py-2 px-3 rounded-xl transition-all';
+            });
+            const activeBtn = document.getElementById(`cat-${cat}`);
+            if (activeBtn) {
+                activeBtn.className = 'cat-btn bg-kpop-pink text-white text-xs font-bold py-2 px-3 rounded-xl transition-all shadow-neon-pink';
+            }
+        }
+
+        /* ==========================================================================
+           GAME CORE LOGIC
+           ========================================================================== */
+        function startGame(mode) {
+            sounds.playClick();
+            gameState.mode = mode;
+            gameState.score = 0;
+            gameState.streak = 0;
+            gameState.maxStreak = 0;
+            gameState.currentQuestionIdx = 0;
+            gameState.correctAnswersCount = 0;
+            gameState.totalAnswered = 0;
+            gameState.lifelines = { '5050': true, 'hint': true, 'skip': true };
+
+            resetLifelineUI();
+
+            // Prepare Questions Pool
+            let rawPool = [];
+            if (mode === 'survival') {
+                rawPool = [
+                    ...questionDatabase.song,
+                    ...questionDatabase.idol,
+                    ...questionDatabase.group,
+                    ...questionDatabase.trivia
+                ];
+            } else {
+                rawPool = questionDatabase[mode] || questionDatabase.trivia;
+            }
+
+            // Apply category filter
+            let filtered = rawPool.filter(q => {
+                if (gameState.category === 'gen23') return q.gen === 'gen23';
+                if (gameState.category === 'gen45') return q.gen === 'gen45';
+                if (gameState.category === 'gg') return q.typeGroup === 'gg';
+                return true;
+            });
+
+            if (filtered.length < 3) {
+                filtered = rawPool; // Fallback if filtered pool is too small
+            }
+
+            // Shuffle questions
+            gameState.questions = [...filtered].sort(() => Math.random() - 0.5);
+
+            if (mode === 'survival') {
+                gameState.timeLeft = 60; // 60 seconds total for survival
+            }
+
+            showScreen('game');
+            loadQuestion();
+
+            if (mode === 'survival') {
+                startSurvivalTimer();
+            }
+        }
+
+        function loadQuestion() {
+            clearInterval(gameState.timer);
+            
+            if (gameState.mode !== 'survival' && gameState.currentQuestionIdx >= Math.min(10, gameState.questions.length)) {
+                endGame();
+                return;
+            }
+
+            const q = gameState.questions[gameState.currentQuestionIdx % gameState.questions.length];
+            
+            // HUD Update
+            document.getElementById('currentScore').innerText = gameState.score;
+            document.getElementById('streakCount').innerText = `x${gameState.streak}`;
+            document.getElementById('questionNum').innerText = gameState.mode === 'survival' 
+                ? `Soal ${gameState.currentQuestionIdx + 1}` 
+                : `Soal ${gameState.currentQuestionIdx + 1} / ${Math.min(10, gameState.questions.length)}`;
+
+            document.getElementById('modeBadge').innerHTML = `<i class="fa-solid fa-gamepad"></i> Mode: ${getModeTitle(gameState.mode)}`;
+            document.getElementById('extraHintBox').classList.add('hidden');
+
+            // Reset Prompts
+            document.getElementById('audioPrompt').classList.add('hidden');
+            document.getElementById('visualPrompt').classList.add('hidden');
+
+            // Setup Question Prompts based on Type/Mode
+            if (q.type === 'song') {
+                document.getElementById('audioPrompt').classList.remove('hidden');
+            } else if (q.avatar) {
+                document.getElementById('visualPrompt').classList.remove('hidden');
+                document.getElementById('avatarBox').innerText = q.avatar;
+            }
+
+            document.getElementById('questionText').innerText = q.text;
+
+            // Render Options
+            const grid = document.getElementById('optionsGrid');
+            grid.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn p-4 rounded-2xl bg-white/5 hover:bg-purple-600/20 border border-white/10 hover:border-kpop-pink text-left text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-between group';
+                btn.innerHTML = `
+                    <span>${opt}</span>
+                    <div class="w-5 h-5 rounded-full border border-white/20 group-hover:border-kpop-pink flex items-center justify-center text-[10px] text-gray-400 group-hover:text-kpop-pink">
+                        ${String.fromCharCode(65 + idx)}
+                    </div>
+                `;
+                btn.onclick = () => checkAnswer(idx);
+                grid.appendChild(btn);
+            });
+
+            // Start per-question timer if not survival mode
+            if (gameState.mode !== 'survival') {
+                startPerQuestionTimer();
+            }
+        }
+
+        function getModeTitle(mode) {
+            const titles = {
+                song: 'Tebak Lagu',
+                idol: 'Tebak Idol',
+                group: 'Tebak Grup',
+                trivia: 'K-Pop Trivia',
+                survival: 'Survival 60s'
+            };
+            return titles[mode] || 'Quiz';
+        }
+
+        function playQuestionMelody() {
+            const q = gameState.questions[gameState.currentQuestionIdx % gameState.questions.length];
+            if (q && q.melody) {
+                sounds.playMelodyNotes(q.melody);
+            }
+        }
+
+        /* Timers */
+        function startPerQuestionTimer() {
+            gameState.timeLeft = 15;
+            updateTimerUI();
+            gameState.timer = setInterval(() => {
+                gameState.timeLeft--;
+                updateTimerUI();
+                if (gameState.timeLeft <= 0) {
+                    clearInterval(gameState.timer);
+                    sounds.playWrong();
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        function startSurvivalTimer() {
+            document.getElementById('timerLabel').innerText = 'SURVIVAL TIMER';
+            gameState.timer = setInterval(() => {
+                gameState.timeLeft--;
+                updateTimerUI();
+                if (gameState.timeLeft <= 0) {
+                    clearInterval(gameState.timer);
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            const timerText = document.getElementById('timerText');
+            const timerBar = document.getElementById('timerBar');
+            timerText.innerText = `${gameState.timeLeft}s`;
+            
+            const max = gameState.mode === 'survival' ? 60 : 15;
+            const pct = Math.max(0, (gameState.timeLeft / max) * 100);
+            timerBar.style.width = `${pct}%`;
+
+            if (gameState.timeLeft <= 5) {
+                timerText.className = 'font-display font-black text-xl text-red-500 animate-pulse';
+            } else {
+                timerText.className = 'font-display font-black text-xl text-pink-400';
+            }
+        }
+
+        function handleTimeout() {
+            gameState.streak = 0;
+            gameState.totalAnswered++;
+            nextQuestion();
+        }
+
+        /* Answer Checking */
+        function checkAnswer(selectedIdx) {
+            clearInterval(gameState.timer);
+            const q = gameState.questions[gameState.currentQuestionIdx % gameState.questions.length];
+            const buttons = document.querySelectorAll('.opt-btn');
+
+            gameState.totalAnswered++;
+
+            if (selectedIdx === q.answer) {
+                // Correct Answer
+                sounds.playCorrect();
+                buttons[selectedIdx].classList.add('bg-green-500/30', 'border-green-500', 'text-green-300');
+                
+                gameState.streak++;
+                if (gameState.streak > gameState.maxStreak) gameState.maxStreak = gameState.streak;
+                
+                const streakMultiplier = 1 + (gameState.streak * 0.2);
+                const pointsGained = Math.round(100 * streakMultiplier);
+                gameState.score += pointsGained;
+                gameState.correctAnswersCount++;
+
+            } else {
+                // Wrong Answer
+                sounds.playWrong();
+                buttons[selectedIdx].classList.add('bg-red-500/30', 'border-red-500', 'text-red-300');
+                buttons[q.answer].classList.add('bg-green-500/30', 'border-green-500', 'text-green-300');
+                gameState.streak = 0;
+            }
+
+            // Disable all option buttons temporarily
+            buttons.forEach(btn => btn.onclick = null);
+
+            setTimeout(() => {
+                nextQuestion();
+            }, 1200);
+        }
+
+        function nextQuestion() {
+            gameState.currentQuestionIdx++;
+            loadQuestion();
+        }
+
+        /* Lifelines Logic */
+        function resetLifelineUI() {
+            ['5050', 'hint', 'skip'].forEach(type => {
+                const btn = document.getElementById(`btn${type === '5050' ? '5050' : type.charAt(0).toUpperCase() + type.slice(1)}`);
+                btn.disabled = false;
+                btn.classList.remove('opacity-30', 'cursor-not-allowed');
+            });
+        }
+
+        function useLifeline(type) {
+            if (!gameState.lifelines[type]) return;
+            sounds.playClick();
+            
+            const q = gameState.questions[gameState.currentQuestionIdx % gameState.questions.length];
+            const buttons = document.querySelectorAll('.opt-btn');
+
+            if (type === '5050') {
+                let removed = 0;
+                buttons.forEach((btn, idx) => {
+                    if (idx !== q.answer && removed < 2) {
+                        btn.style.visibility = 'hidden';
+                        removed++;
+                    }
+                });
+            } else if (type === 'hint') {
+                document.getElementById('extraHintText').innerText = q.hint || 'Tidak ada petunjuk ekstra.';
+                document.getElementById('extraHintBox').classList.remove('hidden');
+            } else if (type === 'skip') {
+                nextQuestion();
+                return;
+            }
+
+            gameState.lifelines[type] = false;
+            const btn = document.getElementById(`btn${type === '5050' ? '5050' : type.charAt(0).toUpperCase() + type.slice(1)}`);
+            btn.disabled = true;
+            btn.classList.add('opacity-30', 'cursor-not-allowed');
+        }
+
+        /* ==========================================================================
+           END GAME & RANKING SYSTEM
+           ========================================================================== */
+        function endGame() {
+            clearInterval(gameState.timer);
+
+            const accuracy = gameState.totalAnswered > 0 
+                ? Math.round((gameState.correctAnswersCount / gameState.totalAnswered) * 100) 
+                : 0;
+
+            document.getElementById('finalScore').innerText = gameState.score;
+            document.getElementById('finalAccuracy').innerText = `${accuracy}%`;
+            document.getElementById('finalCombo').innerText = `${gameState.maxStreak}x`;
+
+            // Calculate K-Pop Rank
+            const rank = calculateRank(gameState.score, accuracy);
+            document.getElementById('rankIcon').innerText = rank.icon;
+            document.getElementById('rankTitle').innerText = rank.title;
+            document.getElementById('rankDesc').innerText = rank.desc;
+
+            // Save High Score
+            saveHighScore(gameState.mode, gameState.score, rank.title);
+
+            showScreen('result');
+
+            // Trigger Confetti for top ranks
+            if (accuracy >= 70 || gameState.score >= 500) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        function calculateRank(score, accuracy) {
+            if (score >= 1000 && accuracy >= 80) {
+                return {
+                    title: 'K-POP LEGEND 👑',
+                    icon: '👑',
+                    desc: 'Luar biasa! Pengetahuan K-Pop kamu setingkat legenda industri musik!'
+                };
+            } else if (score >= 700) {
+                return {
+                    title: 'GLOBAL SUPERSTAR 🌟',
+                    icon: '🌟',
+                    desc: 'Hebat banget! Kamu pantas berada di panggung utama konser internasional!'
+                };
+            } else if (score >= 400) {
+                return {
+                    title: 'K-POP IDOL 🎤',
+                    icon: '🎤',
+                    desc: 'Bagus! Kamu sudah resmi debut dan jadi idola para penggemar K-Pop!'
+                };
+            } else if (score >= 200) {
+                return {
+                    title: 'ROOKIE OF THE YEAR 💫',
+                    icon: '💫',
+                    desc: 'Pendatang baru berbakat! Sedikit lagi kamu akan meraih Daesang!'
+                };
+            } else {
+                return {
+                    title: 'TRAINEE 🔰',
+                    icon: '🔰',
+                    desc: 'Terus berlatih! Pelajari lebih banyak lagu dan grup K-Pop favoritmu!'
+                };
+            }
+        }
+
+        function retryCurrentMode() {
+            startGame(gameState.mode);
+        }
+
+        /* ==========================================================================
+           LOCAL STORAGE LEADERBOARD
+           ========================================================================== */
+        function saveHighScore(mode, score, rankTitle) {
+            const board = JSON.parse(localStorage.getItem('kpop_quiz_leaderboard') || '[]');
+            board.push({
+                mode: getModeTitle(mode),
+                score: score,
+                rank: rankTitle,
+                date: new Date().toLocaleDateString('id-ID')
+            });
+            // Sort highest score first
+            board.sort((a, b) => b.score - a.score);
+            // Keep top 10
+            localStorage.setItem('kpop_quiz_leaderboard', JSON.stringify(board.slice(0, 10)));
+        }
+
+        function renderLeaderboard() {
+            const board = JSON.parse(localStorage.getItem('kpop_quiz_leaderboard') || '[]');
+            const list = document.getElementById('leaderboardList');
+            list.innerHTML = '';
+
+            if (board.length === 0) {
+                list.innerHTML = `<p class="text-center text-xs text-gray-400 py-6">Belum ada rekor skor disimpan. Mainkan game untuk mencetak rekor!</p>`;
+                return;
+            }
+
+            board.forEach((item, idx) => {
+                const el = document.createElement('div');
+                el.className = 'p-3 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-xs';
+                el.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="font-display font-black ${idx === 0 ? 'text-kpop-yellow text-base' : 'text-gray-400'}">#${idx + 1}</span>
+                        <div>
+                            <span class="font-bold text-white block">${item.rank}</span>
+                            <span class="text-[10px] text-gray-400">Mode: ${item.mode} • ${item.date}</span>
+                        </div>
+                    </div>
+                    <span class="font-display font-black text-kpop-cyan text-sm">${item.score} pts</span>
+                `;
+                list.appendChild(el);
+            });
+        }
+
+        function clearLeaderboard() {
+            if (confirm('Apakah kamu yakin ingin menghapus semua rekor skor?')) {
+                localStorage.removeItem('kpop_quiz_leaderboard');
+                renderLeaderboard();
+            }
+        }
+
+        // Initialize App on Load
+        window.onload = function() {
+            showScreen('home');
+        };
+    </script>
+</body>
+</html>
